@@ -2,8 +2,10 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        @fluxAppearance
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <!-- Sidebar -->
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
@@ -11,23 +13,38 @@
                 <x-app-logo />
             </a>
 
+            <!-- Plataforma Section -->
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
+                <flux:navlist.group :heading="__('Plataforma')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
-            <flux:spacer />
-
+            <!-- Gestión de Equipos Dropdown -->
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
+                <flux:navlist.group :heading="__('Gestión de Equipos')" class="grid">
+                    <flux:navlist.item icon="clipboard-custom" href="#"  class="dropdown-toggle">{{ __('Inventario') }}</flux:navlist.item>
+                    <flux:navlist.item icon="truck" href="#" class="dropdown-toggle">{{ __('Préstamos') }}</flux:navlist.item>
+                </flux:navlist.group>
             </flux:navlist>
+
+            <!-- Administración Dropdown -->
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Administración')" class="grid">
+                    <flux:navlist.item icon="map-pin" href="#" class="dropdown-toggle">{{ __('Ubicaciones') }}</flux:navlist.item>
+                    <flux:navlist.item icon="rocket-launch" href="#" class="dropdown-toggle">{{ __('Estados') }}</flux:navlist.item>
+                    <flux:navlist.item icon="computer-desktop" href="#" class="dropdown-toggle">{{ __('Dispositivos') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
+
+            <!-- Usuarios -->
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Gestión de Usuarios')" class="grid">
+                    <flux:navlist.item icon="users" href="#" class="dropdown-toggle">{{ __('Usuarios') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
+
+            <flux:spacer />
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
@@ -42,9 +59,7 @@
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
+                                    <span class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
@@ -75,12 +90,13 @@
             </flux:dropdown>
         </flux:sidebar>
 
-        <!-- Mobile User Menu -->
+        <!-- Mobile Header -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <flux:spacer />
 
+            <!-- Mobile User Dropdown -->
             <flux:dropdown position="top" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
@@ -92,9 +108,7 @@
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
+                                    <span class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
@@ -125,8 +139,10 @@
             </flux:dropdown>
         </flux:header>
 
+        <!-- Main Content -->
         {{ $slot }}
 
+        <!-- Scripts -->
         @fluxScripts
     </body>
 </html>
