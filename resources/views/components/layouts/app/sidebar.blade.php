@@ -27,8 +27,8 @@
                     <flux:navlist.item icon="truck" href="#" class="dropdown-toggle">{{ __('Préstamos') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-
             <!-- Administración Dropdown -->
+            @role('admin')
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Administración')" class="grid">
                     <flux:navlist.item icon="map-pin" href="#" class="dropdown-toggle">{{ __('Ubicaciones') }}</flux:navlist.item>
@@ -36,13 +36,15 @@
                     <flux:navlist.item icon="computer-desktop" href="#" class="dropdown-toggle">{{ __('Dispositivos') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-
+            @endrole
             <!-- Usuarios -->
+            @role('admin')
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Gestión de Usuarios')" class="grid">
                     <flux:navlist.item icon="users" href="#" class="dropdown-toggle">{{ __('Usuarios') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
+            @endrole
 
             <flux:spacer />
 
