@@ -23,7 +23,7 @@
             <!-- Gestión de Equipos Dropdown -->
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Gestión de Equipos')" class="grid">
-                    <flux:navlist.item icon="clipboard-custom" href="#"  class="dropdown-toggle">{{ __('Inventario') }}</flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-list" href="#"  class="dropdown-toggle">{{ __('Inventario') }}</flux:navlist.item>
                     <flux:navlist.item icon="truck" href="#" class="dropdown-toggle">{{ __('Préstamos') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
