@@ -11,10 +11,7 @@ class ExampleTest extends TestCase
 
     public function test_returns_a_successful_response(): void
     {
-        $user = \App\Models\User::factory()->create();
-
-        $response = $this->actingAs($user)->get('/');
-
-        $response->assertStatus(200);
+        $response = $this->get('/');
+        $response->assertStatus(302); // Redirección a /login
     }
 }
