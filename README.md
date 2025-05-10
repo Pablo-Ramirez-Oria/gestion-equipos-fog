@@ -12,7 +12,7 @@ Facilitar el seguimiento del estado, ubicación y disponibilidad de los equipos 
 
 - **Framework**: Laravel 12
 - **Frontend**: Blade + Tailwind CSS
-- **UI Kit**: [Flowbite Design System](https://flowbite.com/design-system/) para componentes + [Flux Components] para estructura y layout.
+- **UI Kit**: [Flowbite Design System](https://flowbite.com/design-system/) para componentes + Flux para estructura y layout.
 - **Autenticación**: Laravel Breeze + Livewire
 - **Base de datos**: MongoDB (NoSQL)
 - **Integraciones**: FOG Project API
