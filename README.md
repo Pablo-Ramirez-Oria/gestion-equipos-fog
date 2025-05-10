@@ -35,3 +35,12 @@ El diseño está realizado con **Flowbite Design System**, con estilo adaptado p
 
 - `admin`: acceso completo, administración de usuarios, ubicaciones, equipos y préstamos.
 - `usuario`: acceso limitado (solo lectura).
+
+## Configuración de la API de FOG
+
+Para configurar la API de FOG, añade las siguientes entradas a tu archivo `.env`:
+
+```env
+FOG_SERVER_URL=http://tu-servidor-fog.com
+FOG_API_TOKEN=tu_api_token
+FOG_USER_TOKEN=tu_user_token
