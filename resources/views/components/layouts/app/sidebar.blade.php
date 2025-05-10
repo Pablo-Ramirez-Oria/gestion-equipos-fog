@@ -23,17 +23,17 @@
             <!-- Gestión de Equipos Dropdown -->
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Gestión de Equipos')" class="grid">
-                    <flux:navlist.item icon="clipboard-document-list" href="#"  class="dropdown-toggle">{{ __('Inventario') }}</flux:navlist.item>
-                    <flux:navlist.item icon="truck" href="#" class="dropdown-toggle">{{ __('Préstamos') }}</flux:navlist.item>
+                    <flux:navlist.item icon="clipboard-document-list" :href="route('inventario.index')" :current="request()->routeIs('inventario.*')" class="dropdown-toggle">{{ __('Inventario') }}</flux:navlist.item>
+                    <flux:navlist.item icon="truck" :href="route('prestamos.index')" :current="request()->routeIs('prestamos.*')" class="dropdown-toggle">{{ __('Préstamos') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
             <!-- Administración Dropdown -->
             @role('admin')
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Administración')" class="grid">
-                    <flux:navlist.item icon="map-pin" href="#" class="dropdown-toggle">{{ __('Ubicaciones') }}</flux:navlist.item>
-                    <flux:navlist.item icon="rocket-launch" href="#" class="dropdown-toggle">{{ __('Estados') }}</flux:navlist.item>
-                    <flux:navlist.item icon="computer-desktop" href="#" class="dropdown-toggle">{{ __('Dispositivos') }}</flux:navlist.item>
+                    <flux:navlist.item icon="map-pin" :href="route('ubicaciones.index')" :current="request()->routeIs('ubicaciones.*')" class="dropdown-toggle">{{ __('Ubicaciones') }}</flux:navlist.item>
+                    <flux:navlist.item icon="rocket-launch" :href="route('estados.index')" :current="request()->routeIs('estados.*')" class="dropdown-toggle">{{ __('Estados') }}</flux:navlist.item>
+                    <flux:navlist.item icon="computer-desktop" :href="route('dispositivos.index')" :current="request()->routeIs('dispositivos.*')" class="dropdown-toggle">{{ __('Dispositivos') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
             @endrole
@@ -41,7 +41,7 @@
             @role('admin')
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Gestión de Usuarios')" class="grid">
-                    <flux:navlist.item icon="users" href="#" class="dropdown-toggle">{{ __('Usuarios') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('usuarios.index')" :current="request()->routeIs('usuarios.*')" class="dropdown-toggle">{{ __('Usuarios') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
             @endrole

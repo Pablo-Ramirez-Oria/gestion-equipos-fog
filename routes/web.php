@@ -5,14 +5,37 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\PrestamoController;
+use App\Http\Controllers\UbicacionController;
+use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\DispositivoController;
+use App\Http\Controllers\UsuarioController;
 
-Route::view('dashboard', 'dashboard')
+Route::redirect('/', '/dashboard')
     ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    ->name('home');
 
+/* Rutas principales pasando por el middleware */
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+
+    // Rutas accesibles para todos los usuarios autenticados (lectura de inventario y préstamos)
+    Route::resource('inventario', InventarioController::class)->only(['index', 'show']);
+    Route::resource('prestamos', PrestamoController::class)->only(['index', 'show']);
+
+    // Rutas restringidas a administradores
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('inventario', InventarioController::class)->except(['index', 'show']);
+        Route::resource('prestamos', PrestamoController::class)->except(['index', 'show']);
+        Route::resource('ubicaciones', UbicacionController::class);
+        Route::resource('estados', EstadoController::class);
+        Route::resource('dispositivos', DispositivoController::class);
+        Route::resource('usuarios', UsuarioController::class);
+    });
+});
+
+/* Middleware de autenticación */
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
