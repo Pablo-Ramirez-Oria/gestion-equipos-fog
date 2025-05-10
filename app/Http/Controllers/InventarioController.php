@@ -2,61 +2,64 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class InventarioController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $productos = [
-            [
-                'Número de serie' => 'NKNJ50LU0000I05091',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 2.5',
-                'Estado' => 'En uso',
-            ],
-            [
-                'Número de serie' => 'R2BHK9VZ0000H21563',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 3.1',
-                'Estado' => 'En uso',
-            ],
-            [
-                'Número de serie' => 'JX6K74PU0000T30041',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 1.2',
-                'Estado' => 'En uso',
-            ],
-            [
-                'Número de serie' => 'FP8L21UE0000G78629',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 4.3',
-                'Estado' => 'Disponible',
-            ],
-            [
-                'Número de serie' => 'B3VQ0PZZ0000M42376',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 2.4',
-                'Estado' => 'En uso',
-            ],
-            [
-                'Número de serie' => 'D1EJ45LG0000S67012',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 5.2',
-                'Estado' => 'Disponible',
-            ],
-            [
-                'Número de serie' => 'L4VZ21XY0000Q50673',
-                'Tipo de dispositivo' => 'Microordenador portátil',
-                'Ubicación' => 'Aula 2.3',
-                'Estado' => 'En uso',
-            ],
-        ];
+        // Realizamos el fetch a la API de FOG
+        $response = Http::withHeaders([
+            'fog-api-token' => env('FOG_API_TOKEN'),
+            'fog-user-token' => env('FOG_USER_TOKEN'),
+        ])->get(env('FOG_SERVER_URL') . '/fog/host');
 
-        return view('modules.inventario.index', compact('productos'));
+        // Verificamos si la petición fue exitosa
+        if ($response->successful()) {
+            // Extraemos los datos de la respuesta
+            $fogData = $response->json();
+            $productos = $fogData['hosts'];
+
+            // Limpiamos datos innecesarios y formateamos las claves
+            $productos = array_map(function ($producto) {
+                // Aquí eliminamos campos innecesarios y cambiamos nombres de claves
+                unset($producto['image'], $producto['hostscreen'], $producto['hostalo'], $producto['macs']);
+
+                // Renombramos las claves
+                $producto['id_equipo'] = $producto['id'];
+                $producto['nombre'] = $producto['name'];
+                $producto['descripcion'] = $producto['description'];
+                $producto['ip'] = $producto['ip'];
+                $producto['fecha_creacion'] = $producto['createdTime'];
+                $producto['mac'] = $producto['primac'];
+                unset($producto['id'], $producto['name'], $producto['description'], $producto['createdTime'], $producto['primac']);
+                
+                return $producto;
+            }, $productos);
+
+            // Paginamos los productos
+            $perPage = 13;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentItems = array_slice($productos, ($currentPage - 1) * $perPage, $perPage);
+            $productos = new LengthAwarePaginator(
+                $currentItems,
+                count($productos),
+                $perPage,
+                $currentPage,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+
+            // Pasamos los datos a la vista
+            return view('modules.inventario.index', compact('productos'));
+        } else {
+            // Si no fue exitosa la petición, redirigimos a la página principal con un mensaje de error
+            return redirect()->route('home')->with('error', 'No se pudo obtener los datos del inventario.');
+        }
     }
 
     /**
