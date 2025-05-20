@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         User::where('email', 'admin@iesmartinezm.es')->delete();
         User::where('email', 'user@iesmartinezm.es')->delete();
 
+        // Roles de usuario
         Role::firstOrCreate(['name' => 'admin']);
         Role::firstOrCreate(['name' => 'user']);
 
@@ -36,5 +37,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password')
         ]);
         $user->assignRole('user');
+
+        // Llamada a los otros seeders
+        $this->call([
+        UbicacionSeeder::class,
+        EstadoSeeder::class,
+        ActualizarEquipoSeeder::class,
+    ]);
     }
 }

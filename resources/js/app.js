@@ -1,1 +1,1 @@
-import 'flowbite';
+import '../../node_modules/flowbite/dist/flowbite.js';
