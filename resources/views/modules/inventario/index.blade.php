@@ -51,6 +51,17 @@
                         <i class="fi fi-rr-cross-small me-1"></i> Quitar filtros
                     </a>
                 @endif
+                
+                @role('admin')
+                    <a href="{{ route('inventario.create') }}"
+                    class="inline-flex items-center py-2 text-sm font-medium text-white rounded-lg">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Crear equipo
+                    </a>
+                @endrole
+
             </div>
 
             <!-- Formulario de búsqueda -->
@@ -66,6 +77,25 @@
             </form>
         </div>
 
+        @if (session('error'))
+            <div id="alert-error" class="flex items-center justify-between p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-red-200 dark:text-red-900" role="alert">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 002 0V7zm-1 6a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clip-rule="evenodd"/></svg>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('alert-error').remove()" class="ml-4 text-red-800 hover:underline dark:text-red-900">
+                    ✕
+                </button>
+            </div>
+
+            <script>
+                setTimeout(() => {
+                    const alert = document.getElementById('alert-error');
+                    if (alert) alert.remove();
+                }, 5000);
+            </script>
+        @endif
+
         <!-- Tabla -->
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -80,22 +110,24 @@
                     <th class="px-4 py-3">Estado</th>
                     <th class="px-4 py-3">Finalidad</th>
                     <th class="px-4 py-3">Inventario</th>
-                    <th class="px-4 py-3">Acciones</th>
+                    @role('admin')
+                        <th class="px-4 py-3">Acciones</th>
+                    @endrole
                 </tr>
             </thead>
             <tbody>
             @foreach ($productos as $producto)
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td class="px-4 py-4">{{ $producto['id_equipo'] }}</td>
-                    <td class="px-4 py-4">{{ $producto['nombre'] ?: '-' }}</td>
-                    <td class="px-4 py-4">{{ $producto['descripcion'] ?: '-' }}</td>
-                    <td class="px-4 py-4">{{ $producto['ip'] ?: '-' }}</td>
-                    <td class="px-4 py-4">{{ $producto['fecha_creacion'] ?: '-' }}</td>
-                    <td class="px-4 py-4">{{ $producto['mac'] ?: '-' }}</td>
-                    <td class="px-4 py-4">{{ $producto['ubicacion'] }}</td>
-                    <td class="px-4 py-4">{{ $producto['estado'] }}</td>
-                    <td class="px-4 py-4">{{ $producto['finalidad_actual'] }}</td>
-                    <td class="px-4 py-4">
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['id_equipo'] }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['nombre'] ?: '-' }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['descripcion'] ?: '-' }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['ip'] ?: '-' }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['fecha_creacion'] ?: '-' }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['mac'] ?: '-' }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['ubicacion'] }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['estado'] }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['finalidad_actual'] }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">
                         @if (!empty($producto['id_equipo']))
                             <button type="button" class="text-blue-600 dark:text-blue-500 hover:underline" data-modal-toggle="modal-{{ $producto['id_equipo'] }}">
                                 Detalles de inventario
@@ -121,11 +153,12 @@
                             </div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    @role('admin')
+                    <td class="px-6 py-4 whitespace-nowrap truncate max-w-xs">
                         @if (!empty($producto['id_equipo']))
-                            <button type="button" class="text-yellow-600 hover:underline" onclick="location.href='{{ route('inventario.edit', $producto['id_equipo']) }}'">
+                            <a href="{{ route('inventario.edit', $producto['id_equipo']) }}" class="text-yellow-600 hover:underline">
                                 Editar
-                            </button>
+                            </a>
                             <span class="mx-2">|</span>
                             <button type="button" class="text-red-600 hover:underline" data-modal-toggle="modal-eliminar-{{ $producto['id_equipo'] }}">
                                 Eliminar
@@ -156,6 +189,7 @@
                             </div>
                         @endif
                     </td>
+                    @endrole
                 </tr>
             @endforeach
             </tbody>
