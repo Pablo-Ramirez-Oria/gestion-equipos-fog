@@ -206,6 +206,20 @@ class InventarioController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Eliminar en FOG
+        $response = Http::withHeaders([
+            'fog-api-token' => env('FOG_API_TOKEN'),
+            'fog-user-token' => env('FOG_USER_TOKEN'),
+        ])->delete(env('FOG_SERVER_URL') . "/fog/host/{$id}");
+
+        if (!$response->successful()) {
+            return redirect()->back()->with('error', 'No se pudo eliminar el equipo en FOG.');
+        }
+
+        // Eliminar el detalle local
+        InventarioDetalle::where('fog_id', $id)->delete();
+
+        return redirect()->route('inventario.index')->with('success', 'Equipo eliminado correctamente.');
     }
+
 }

@@ -77,6 +77,19 @@
             </form>
         </div>
 
+        @if (session('success'))
+            <div id="alert-success" class="flex items-center justify-between p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-green-200 dark:text-green-900" role="alert">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4l5-5-1.414-1.414L9 11.172 7.414 9.586 6 11l3 3z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('alert-success').remove()" class="ml-4 text-green-800 hover:underline dark:text-green-900">
+                    ✕
+                </button>
+            </div>
+        @endif
         @if (session('error'))
             <div id="alert-error" class="flex items-center justify-between p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-red-200 dark:text-red-900" role="alert">
                 <div class="flex items-center gap-2">
@@ -95,6 +108,7 @@
                 }, 5000);
             </script>
         @endif
+        
 
         <!-- Tabla -->
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
