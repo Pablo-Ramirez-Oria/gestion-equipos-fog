@@ -11,6 +11,13 @@ use App\Models\Ubicacion;
 
 class InventarioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin')->only([
+            'create', 'store', 'edit', 'update', 'destroy'
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -108,7 +115,13 @@ class InventarioController extends Controller
      */
     public function create()
     {
-        //
+        $estados = Estado::all();
+        $ubicaciones = Ubicacion::all();
+
+        return view('modules.inventario.create', [
+            'estados' => $estados,
+            'ubicaciones' => $ubicaciones,
+        ]);
     }
 
     /**
@@ -116,7 +129,101 @@ class InventarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validar los datos del formulario
+        $request->validate([
+            'nombre' => 'required|string|max:15|regex:/^\S+$/',
+            'descripcion' => 'nullable|string|max:255',
+            'mac' => 'required|regex:/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/',
+            'estado_id' => 'nullable|exists:estados,id',
+            'ubicacion_id' => 'nullable|exists:ubicaciones,id',
+            'finalidad' => 'nullable|string|max:255',
+        ]);
+
+        $macInput = strtolower($request->mac);
+
+        // Verificar si la MAC ya está registrada en FOG
+        $response = Http::withHeaders([
+            'fog-api-token' => env('FOG_API_TOKEN'),
+            'fog-user-token' => env('FOG_USER_TOKEN'),
+        ])->get(env('FOG_SERVER_URL') . '/fog/host');
+
+        if (!$response->successful()) {
+            return redirect()->back()->with('error', 'No se pudieron obtener los hosts desde FOG para validar la MAC.');
+        }
+
+        $hosts = $response->json()['hosts'] ?? [];
+
+        // Extraer todas las MACs de todos los hosts
+        $macsRegistradas = collect($hosts)->flatMap(function ($host) {
+            $macs = [];
+
+            if (!empty($host['primac'])) {
+                $macs[] = strtolower($host['primac']);
+            }
+
+            if (!empty($host['macs']) && is_array($host['macs'])) {
+                foreach ($host['macs'] as $macEntry) {
+                    if (!empty($macEntry['mac'])) {
+                        $macs[] = strtolower($macEntry['mac']);
+                    }
+                }
+            }
+
+            return $macs;
+        })->unique();
+
+        if ($macsRegistradas->contains($macInput)) {
+            return redirect()->back()->withInput()
+                ->with('error', 'La dirección MAC ya está registrada en FOG. Debe ser única.');
+        }
+
+        // Preparar los datos para la creación del host en FOG
+        $payload = [
+            'name' => $request->nombre,
+            'description' => $request->descripcion,
+            'macs' => [$macInput],
+        ];
+
+        try {
+            // Enviar la solicitud a la API de FOG
+            $fogResponse = Http::withHeaders([
+                'fog-api-token' => env('FOG_API_TOKEN'),
+                'fog-user-token' => env('FOG_USER_TOKEN'),
+            ])->post(env('FOG_SERVER_URL') . '/fog/host/create', $payload);
+
+            if (!$fogResponse->successful()) {
+                $status = $fogResponse->status();
+                $errorBody = $fogResponse->body();
+
+                \Log::error('Error al crear el host en FOG', [
+                    'status' => $status,
+                    'body' => $errorBody,
+                ]);
+
+                return redirect()->back()->withInput()->with('error', 'No se pudo crear el equipo en FOG. Código de estado: ' . $status);
+            }
+
+            $data = $fogResponse->json();
+            $fogId = $data['id'] ?? null;
+
+            if (!$fogId) {
+                \Log::error('Respuesta de FOG sin ID de host', ['response' => $data]);
+                return redirect()->back()->withInput()->with('error', 'La respuesta de FOG no contiene un ID de host válido.');
+            }
+
+            // Guardar los detalles en la base de datos local
+            InventarioDetalle::create([
+                'fog_id' => $fogId,
+                'estado_id' => $request->estado_id,
+                'ubicacion_id' => $request->ubicacion_id,
+                'finalidad_actual' => $request->finalidad,
+            ]);
+
+            return redirect()->route('inventario.index')->with('success', 'Equipo creado correctamente.');
+        } catch (\Exception $e) {
+            \Log::error('Excepción al crear el host en FOG', ['exception' => $e]);
+            return redirect()->back()->withInput()->with('error', 'Ocurrió un error inesperado al crear el equipo en FOG.');
+        }
     }
 
     /**

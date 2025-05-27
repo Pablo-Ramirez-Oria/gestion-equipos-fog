@@ -20,19 +20,13 @@ Route::redirect('/', '/dashboard')
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    // Rutas accesibles para todos los usuarios autenticados (lectura de inventario y préstamos)
-    Route::resource('inventario', InventarioController::class)->only(['index', 'show']);
-    Route::resource('prestamos', PrestamoController::class)->only(['index', 'show']);
-
-    // Rutas restringidas a administradores
-    Route::middleware('role:admin')->group(function () {
-        Route::resource('inventario', InventarioController::class)->except(['index', 'show']);
-        Route::resource('prestamos', PrestamoController::class)->except(['index', 'show']);
-        Route::resource('ubicaciones', UbicacionController::class);
-        Route::resource('estados', EstadoController::class);
-        Route::resource('dispositivos', DispositivoController::class);
-        Route::resource('usuarios', UsuarioController::class);
-    });
+    // Todas las rutas definidas en controladores
+    Route::resource('inventario', InventarioController::class);
+    Route::resource('prestamos', PrestamoController::class);
+    Route::resource('ubicaciones', UbicacionController::class);
+    Route::resource('estados', EstadoController::class);
+    Route::resource('dispositivos', DispositivoController::class);
+    Route::resource('usuarios', UsuarioController::class);
 });
 
 /* Middleware de autenticación */
