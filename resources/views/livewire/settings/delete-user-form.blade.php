@@ -1,4 +1,7 @@
 <section class="mt-10 space-y-6">
+    @role('admin')
+        <!-- Evitamos que el administrador borre su cuenta -->
+    @else
     <div class="relative mb-5">
         <flux:heading>{{ __('Borrar cuenta') }}</flux:heading>
         <flux:subheading>{{ __('Borrar su cuenta y todos sus recursos') }}</flux:subheading>
@@ -31,4 +34,5 @@
             </div>
         </form>
     </flux:modal>
+    @endrole('admin')
 </section>

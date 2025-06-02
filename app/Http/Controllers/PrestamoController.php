@@ -6,9 +6,14 @@ use Illuminate\Http\Request;
 
 class PrestamoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        // Middleware para autenticación de usuarios
+        $this->middleware('role:admin')->only([
+            'create', 'store', 'edit', 'update', 'destroy'
+        ]);
+    }
+    
     public function index()
     {
         return view('modules.prestamos.index');
