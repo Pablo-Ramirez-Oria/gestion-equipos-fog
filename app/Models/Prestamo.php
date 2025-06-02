@@ -8,7 +8,7 @@ class Prestamo extends Model
 {
     protected $fillable = [
         'persona_prestamo_id',
-        'equipo_id',
+        'fog_id',
         'tipo_prestamo',
         'fecha_inicio',
         'fecha_estimacion',
@@ -24,11 +24,6 @@ class Prestamo extends Model
     public function persona()
     {
         return $this->belongsTo(PersonaPrestamo::class, 'persona_prestamo_id');
-    }
-
-    public function equipo()
-    {
-        return $this->belongsTo(Equipo::class);
     }
 
     public function getEstadoAttribute()

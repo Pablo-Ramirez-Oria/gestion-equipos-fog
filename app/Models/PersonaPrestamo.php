@@ -9,8 +9,7 @@ class PersonaPrestamo extends Model
     protected $table = 'personas_prestamo';
 
     protected $fillable = [
-        'nombre',
-        'apellidos',
+        'nombre_completo',
         'mayor_edad',
         'correo',
         'telefono',
