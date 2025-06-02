@@ -40,9 +40,10 @@ class DatabaseSeeder extends Seeder
 
         // Llamada a los otros seeders
         $this->call([
-        UbicacionSeeder::class,
-        EstadoSeeder::class,
-        ActualizarEquipoSeeder::class,
-    ]);
+            UbicacionSeeder::class,
+            EstadoSeeder::class,
+            // Seeders para testing
+            SeederCompleto::class,
+        ]);
     }
 }
