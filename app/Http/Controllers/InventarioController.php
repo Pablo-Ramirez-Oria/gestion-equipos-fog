@@ -13,20 +13,20 @@ class InventarioController extends Controller
 {
     public function __construct()
     {
+        // Middleware para autenticación de usuarios
         $this->middleware('role:admin')->only([
             'create', 'store', 'edit', 'update', 'destroy'
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
+        // Obtener filtros de la solicitud
         $estadoId = $request->input('estado');
         $ubicacionId = $request->input('ubicacion');
         $busqueda = $request->input('busqueda');
 
+        // Petición a la API de FOG para obtener los hosts
         $response = Http::withHeaders([
             'fog-api-token' => env('FOG_API_TOKEN'),
             'fog-user-token' => env('FOG_USER_TOKEN'),
@@ -40,6 +40,7 @@ class InventarioController extends Controller
             return redirect()->route('home')->with('error', 'No se pudo obtener los datos del inventario.');
         }
 
+        // Procesar la respuesta de FOG
         $fogData = $response->json();
         $productosFog = $fogData['hosts'] ?? [];
 
@@ -50,7 +51,7 @@ class InventarioController extends Controller
             ->get()
             ->keyBy('fog_id');
 
-        // Mapear y filtrar productos
+        // Mapeo de productos con detalles y filtros
         $productos = collect($productosFog)->map(function ($producto) use ($detalles, $estadoId, $ubicacionId, $busqueda) {
             $id = $producto['id'];
             $detalle = $detalles[$id] ?? null;
@@ -70,7 +71,7 @@ class InventarioController extends Controller
                 'inventory' => $producto['inventory'] ?? [],
             ];
 
-            // Filtros
+            // Filtrar por estado, ubicación y búsqueda
             if ($estadoId && $mapped['estado_id'] != $estadoId) return null;
             if ($ubicacionId && $mapped['ubicacion_id'] != $ubicacionId) return null;
 
@@ -99,7 +100,7 @@ class InventarioController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Datos para la vista
+        // Envio de datos a la vista
         $estados = Estado::all();
         $ubicaciones = Ubicacion::all();
 
@@ -110,11 +111,9 @@ class InventarioController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
+        // Devolver los estados y ubicaciones para los dropdowns
         $estados = Estado::all();
         $ubicaciones = Ubicacion::all();
 
@@ -124,9 +123,6 @@ class InventarioController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         // Validar los datos del formulario
@@ -141,7 +137,7 @@ class InventarioController extends Controller
 
         $macInput = strtolower($request->mac);
 
-        // Verificar si la MAC ya está registrada en FOG
+        // Verificar si la MAC ya está registrada en FOG (Causa error 500 en la API si ya existe)
         $response = Http::withHeaders([
             'fog-api-token' => env('FOG_API_TOKEN'),
             'fog-user-token' => env('FOG_USER_TOKEN'),
@@ -226,17 +222,11 @@ class InventarioController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         // Obtener datos desde la API
@@ -285,7 +275,7 @@ class InventarioController extends Controller
             'finalidad' => 'nullable|string|max:255',
         ]);
 
-        // Actualiza en la API FOG
+        // Actualiza en la API de FOG
         $fogUpdate = Http::withHeaders([
             'fog-api-token' => env('FOG_API_TOKEN'),
             'fog-user-token' => env('FOG_USER_TOKEN'),
@@ -298,11 +288,11 @@ class InventarioController extends Controller
             return redirect()->back()->with('error', 'Error al actualizar el equipo en FOG.');
         }
 
-        // Actualiza el detalle en la base de datos
+        // Actualiza los detalles en la base de datos
         $detalle = InventarioDetalle::firstOrNew(['fog_id' => $id]);
         $detalle->estado_id = $request->estado_id;
         $detalle->ubicacion_id = $request->ubicacion_id;
-        $detalle->finalidad_actual = $request->input('finalidad'); // ¡IMPORTANTE!
+        $detalle->finalidad_actual = $request->input('finalidad');
         $detalle->save();
 
         return redirect()->route('inventario.index')->with('success', 'Equipo actualizado correctamente.');
@@ -323,7 +313,7 @@ class InventarioController extends Controller
             return redirect()->back()->with('error', 'No se pudo eliminar el equipo en FOG.');
         }
 
-        // Eliminar el detalle local
+        // Eliminar los detalles del equipo en la base de datos local
         InventarioDetalle::where('fog_id', $id)->delete();
 
         return redirect()->route('inventario.index')->with('success', 'Equipo eliminado correctamente.');

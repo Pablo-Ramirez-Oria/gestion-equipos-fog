@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('telefono')->nullable();
             $table->string('curso')->nullable();   // Puede ser nulo si es profesor
             $table->string('unidad')->nullable();  // Puede ser nulo si es profesor
-            $table->enum('tipo', ['alumno', 'profesor']); // Para distinguir el tipo de persona
+            $table->enum('tipo', ['alumno', 'profesor']);
             $table->timestamps();
         });
 

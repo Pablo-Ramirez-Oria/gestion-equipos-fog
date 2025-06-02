@@ -20,7 +20,7 @@ Route::redirect('/', '/dashboard')
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
-    // Todas las rutas definidas en controladores
+    // Las rutas tienen un middleware establecido dentro del controller
     Route::resource('inventario', InventarioController::class);
     Route::resource('prestamos', PrestamoController::class);
     Route::resource('ubicaciones', UbicacionController::class);

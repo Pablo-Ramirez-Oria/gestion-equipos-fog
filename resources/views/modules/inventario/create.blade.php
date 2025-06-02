@@ -1,4 +1,4 @@
-<x-layouts.app :title="__('Crear equipo')">
+<x-layouts.app :title="__('Gestión de equipos en el FOG - Crear equipo')">
     <h1 class="text-2xl mb-4">Crear equipo</h1>
 
     @if (session('error'))

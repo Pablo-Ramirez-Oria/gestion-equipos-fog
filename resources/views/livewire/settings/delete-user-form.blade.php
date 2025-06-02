@@ -1,22 +1,22 @@
 <section class="mt-10 space-y-6">
     <div class="relative mb-5">
-        <flux:heading>{{ __('Delete account') }}</flux:heading>
-        <flux:subheading>{{ __('Delete your account and all of its resources') }}</flux:subheading>
+        <flux:heading>{{ __('Borrar cuenta') }}</flux:heading>
+        <flux:subheading>{{ __('Borrar su cuenta y todos sus recursos') }}</flux:subheading>
     </div>
 
     <flux:modal.trigger name="confirm-user-deletion">
         <flux:button variant="danger" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')">
-            {{ __('Delete account') }}
+            {{ __('Borrar cuenta') }}
         </flux:button>
     </flux:modal.trigger>
 
     <flux:modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable class="max-w-lg">
         <form wire:submit="deleteUser" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Are you sure you want to delete your account?') }}</flux:heading>
+                <flux:heading size="lg">{{ __('¿Está seguro de que quiere eliminar su cuenta?') }}</flux:heading>
 
                 <flux:subheading>
-                    {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+                    {{ __('Una vez su cuenta esté borrada, todos sus recursos e información será permanentemente eliminada. Por favor introduzca su contraseña para confirmar que quiere eliminar permanentemente su cuenta.') }}
                 </flux:subheading>
             </div>
 
@@ -27,7 +27,7 @@
                     <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
                 </flux:modal.close>
 
-                <flux:button variant="danger" type="submit">{{ __('Delete account') }}</flux:button>
+                <flux:button variant="danger" type="submit">{{ __('Borrar cuenta') }}</flux:button>
             </div>
         </form>
     </flux:modal>

@@ -1,4 +1,4 @@
-<x-layouts.app :title="__('Editar equipo')">
+<x-layouts.app :title="__('Gestión de equipos en el FOG - Editar equipo')">
     <h1 class="text-2xl mb-4">Editar equipo: {{ $producto['nombre'] }}</h1>
 
     <form id="edit-form" method="POST" action="{{ route('inventario.update', $producto['id_equipo']) }}" class="max-w-3xl space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">

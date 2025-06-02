@@ -1,4 +1,4 @@
-<x-layouts.app :title="__('Inventario')">
+<x-layouts.app :title="__('Gestión de equipos en el FOG -Inventario')">
     <h1 class="text-2xl">Inventario</h1>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <!-- Filtros y barra de búsqueda -->
