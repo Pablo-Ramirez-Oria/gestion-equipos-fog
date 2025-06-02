@@ -28,12 +28,9 @@ class SeederCompleto extends Seeder
             ]
         );
 
-        $inventario_detalle_id = DB::table('inventario_detalles')->where('fog_id', 100)->value('id');
-
         // Crear personas préstamo
         $persona1 = DB::table('personas_prestamo')->insertGetId([
-            'nombre' => 'Lucía',
-            'apellidos' => 'García Pérez',
+            'nombre_completo' => 'Carlos Pérez Oria',
             'mayor_edad' => true,
             'correo' => 'lucia@example.com',
             'telefono' => '612345678',
@@ -45,8 +42,7 @@ class SeederCompleto extends Seeder
         ]);
 
         $persona2 = DB::table('personas_prestamo')->insertGetId([
-            'nombre' => 'Antonio',
-            'apellidos' => 'Sánchez López',
+            'nombre_completo' => 'Antonio Sánchez',
             'mayor_edad' => true,
             'correo' => 'antonio.sanchez@centro.edu',
             'telefono' => null,
@@ -61,7 +57,7 @@ class SeederCompleto extends Seeder
         DB::table('prestamos')->insert([
             [
                 'persona_prestamo_id' => $persona1,
-                'inventario_detalle_id' => $inventario_detalle_id,
+                'fog_id' => 100,
                 'tipo_prestamo' => 'casa',
                 'fecha_inicio' => Carbon::now()->subDays(3),
                 'fecha_estimacion' => Carbon::now()->addDays(4),
@@ -71,7 +67,7 @@ class SeederCompleto extends Seeder
             ],
             [
                 'persona_prestamo_id' => $persona2,
-                'inventario_detalle_id' => $inventario_detalle_id,
+                'fog_id' => 100,
                 'tipo_prestamo' => 'clase',
                 'fecha_inicio' => Carbon::now()->subDay(),
                 'fecha_estimacion' => Carbon::now()->addDay(),

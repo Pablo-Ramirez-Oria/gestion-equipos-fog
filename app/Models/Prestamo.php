@@ -14,6 +14,12 @@ class Prestamo extends Model
         'fecha_estimacion',
         'fecha_entrega',
     ];
+    
+    protected $casts = [
+        'fecha_inicio' => 'datetime',
+        'fecha_estimacion' => 'datetime',
+        'fecha_entrega' => 'datetime',
+    ];
 
     public function persona()
     {

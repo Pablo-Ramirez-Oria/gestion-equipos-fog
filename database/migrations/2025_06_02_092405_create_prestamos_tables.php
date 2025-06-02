@@ -14,8 +14,7 @@ return new class extends Migration
         // Tabla para almacenar información de la persona a la que se presta
         Schema::create('personas_prestamo', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellidos');
+            $table->string('nombre_completo');
             $table->boolean('mayor_edad')->default(false);
             $table->string('correo')->nullable();
             $table->string('telefono')->nullable();
@@ -29,7 +28,7 @@ return new class extends Migration
         Schema::create('prestamos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('persona_prestamo_id')->constrained('personas_prestamo')->onDelete('cascade');
-            $table->foreignId('inventario_detalle_id')->constrained('inventario_detalles')->onDelete('cascade');
+            $table->unsignedBigInteger('fog_id');
             $table->enum('tipo_prestamo', ['clase', 'casa']);
             $table->dateTime('fecha_inicio');
             $table->dateTime('fecha_estimacion');
