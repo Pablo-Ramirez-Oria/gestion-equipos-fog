@@ -1,6 +1,6 @@
 # Gestión de Equipos en el FOG
 
-Una plataforma web desarrollada en Laravel 12 y Blade, orientada a la **gestión de equipos informáticos** en el IES Martínez Montañés mediante la integración con la API de FOG Project y una base de datos NoSQL.
+Una plataforma web desarrollada en Laravel 12 y Blade, orientada a la **gestión de equipos informáticos** en el IES Martínez Montañés mediante la integración con la API de FOG Project y una base de datos MySQL.
 
 ## Objetivo
 
@@ -14,7 +14,7 @@ Facilitar el seguimiento del estado, ubicación y disponibilidad de los equipos 
 - **Frontend**: Blade + Tailwind CSS
 - **UI Kit**: [Flowbite Design System](https://flowbite.com/design-system/) para componentes + Flux para estructura y layout.
 - **Autenticación**: Laravel Breeze + Livewire
-- **Base de datos**: MongoDB (NoSQL)
+- **Base de datos**: MySQL
 - **Integraciones**: FOG Project API
 
 ---
