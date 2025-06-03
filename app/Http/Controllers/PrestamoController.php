@@ -161,35 +161,99 @@ class PrestamoController extends Controller
         return redirect()->route('prestamos.index')->with('success', 'Préstamo creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $prestamo = Prestamo::with('persona')->findOrFail($id);
+
+        // Obtener datos del equipo desde FOG
+        $response = Http::withHeaders([
+            'fog-api-token' => env('FOG_API_TOKEN'),
+            'fog-user-token' => env('FOG_USER_TOKEN'),
+        ])->get(env('FOG_SERVER_URL') . '/fog/host/' . $prestamo->fog_id);
+
+        if (!$response->successful()) {
+            return redirect()->route('prestamos.index')->with('error', 'No se pudo obtener la información del equipo desde FOG.');
+        }
+
+        $equipoFOG = $response->json();
+
+        $producto = [
+            'id_equipo' => $equipoFOG['id'],
+            'nombre' => $equipoFOG['name'],
+            'descripcion' => $equipoFOG['description'],
+            'ip' => $equipoFOG['ip'],
+            'mac' => $equipoFOG['primac'],
+        ];
+
+        // Personas disponibles (por si se quiere reasignar el préstamo)
+        $personas = PersonaPrestamo::all();
+
+        return view('modules.prestamos.edit', compact('prestamo', 'producto', 'personas'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'fog_id' => ['required', 'integer'],
+            'tipo_prestamo' => ['required', 'in:clase,casa'],
+            'fecha_inicio' => ['required', 'date'],
+            'fecha_estimacion' => ['required', 'date', 'after_or_equal:fecha_inicio'],
+            'fecha_entrega' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'persona_prestamo_id' => ['nullable', 'exists:personas_prestamo,id'],
+            'nombre_completo' => ['required_without:persona_prestamo_id', 'string', 'max:255'],
+            'mayor_edad' => ['nullable', 'boolean'],
+            'correo' => ['nullable', 'email'],
+            'telefono' => ['nullable', 'string'],
+            'curso' => ['nullable', 'string'],
+            'unidad' => ['nullable', 'string'],
+            'tipo' => ['required_without:persona_prestamo_id', 'in:alumno,profesor'],
+        ]);
+
+        // Obtener el préstamo
+        $prestamo = Prestamo::findOrFail($id);
+
+        // Obtener o crear persona
+        if ($request->persona_prestamo_id) {
+            $personaId = $request->persona_prestamo_id;
+        } else {
+            $nuevaPersona = PersonaPrestamo::create([
+                'nombre_completo' => $request->nombre_completo,
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
+                'curso' => $request->curso,
+                'unidad' => $request->unidad,
+                'tipo' => $request->tipo,
+                'mayor_edad' => $request->boolean('mayor_edad', false),
+            ]);
+            $personaId = $nuevaPersona->id;
+        }
+
+        // Actualizar préstamo
+        $prestamo->update([
+            'fog_id' => $request->fog_id,
+            'tipo_prestamo' => $request->tipo_prestamo,
+            'fecha_inicio' => $request->fecha_inicio,
+            'fecha_estimacion' => $request->fecha_estimacion,
+            'fecha_entrega' => $request->fecha_entrega,
+            'persona_prestamo_id' => $personaId,
+        ]);
+
+        return redirect()->route('prestamos.index')->with('success', 'Préstamo actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $prestamo = Prestamo::findOrFail($id);
+
+        // Solo eliminamos el préstamo, no la persona ni nada más
+        $prestamo->delete();
+
+        return redirect()->route('prestamos.index')->with('success', 'Préstamo eliminado correctamente.');
     }
+
 }
