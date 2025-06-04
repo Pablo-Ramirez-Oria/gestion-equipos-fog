@@ -76,7 +76,6 @@
                 </div>
             </form>
         </div>
-
         @if (session('success'))
             <div id="alert-success" class="flex items-center justify-between p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-green-200 dark:text-green-900" role="alert">
                 <div class="flex items-center gap-2">
@@ -108,6 +107,8 @@
                 }, 5000);
             </script>
         @endif
+
+        
         
 
         <!-- Tabla -->

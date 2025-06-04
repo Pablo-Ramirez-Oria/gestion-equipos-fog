@@ -8,9 +8,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class PersonaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = PersonaPrestamo::query();
@@ -44,51 +41,94 @@ class PersonaController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $tipos = [
+            'profesor' => 'Profesor',
+            'alumno' => 'Alumno',
+        ];
+
+        return view('modules.personas.create', compact('tipos'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'nombre_completo' => ['required', 'string', 'max:255'],
+            'mayor_edad' => ['required', 'boolean'],
+            'correo' => ['nullable', 'email', 'max:255'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'curso' => ['nullable', 'string', 'max:255'],
+            'unidad' => ['nullable', 'string', 'max:255'],
+            'tipo' => ['required', 'in:alumno,profesor'],
+        ], [
+            'nombre_completo.required' => 'El nombre completo es obligatorio.',
+            'mayor_edad.required' => 'Debe indicar si es mayor de edad.',
+            'mayor_edad.boolean' => 'El valor de mayor de edad no es válido.',
+            'correo.email' => 'El correo debe ser una dirección válida.',
+            'telefono.max' => 'El teléfono debe tener como máximo 20 caracteres.',
+            'tipo.required' => 'Debe seleccionar un tipo de persona.',
+            'tipo.in' => 'El tipo seleccionado no es válido.',
+        ]);
+
+        try {
+            PersonaPrestamo::create($validated);
+            return redirect()->route('personas.index')->with('success', 'Persona creada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Ocurrió un error al guardar la persona: ' . $e->getMessage());
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(PersonaPrestamo $persona)
     {
-        //
+        return view('modules.personas.edit', compact('persona'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, PersonaPrestamo $persona)
     {
-        //
+        $validated = $request->validate([
+            'nombre_completo' => ['required', 'string', 'max:255'],
+            'mayor_edad' => ['required', 'boolean'],
+            'correo' => ['nullable', 'email', 'max:255'],
+            'telefono' => ['nullable', 'string', 'max:20'],
+            'curso' => ['nullable', 'string', 'max:255'],
+            'unidad' => ['nullable', 'string', 'max:255'],
+            'tipo' => ['required', 'in:alumno,profesor,otro'],
+        ], [
+            'nombre_completo.required' => 'El nombre completo es obligatorio.',
+            'mayor_edad.required' => 'Debe indicar si es mayor de edad.',
+            'mayor_edad.boolean' => 'El valor de mayor de edad no es válido.',
+            'correo.email' => 'El correo debe ser una dirección válida.',
+            'telefono.max' => 'El teléfono debe tener como máximo 20 caracteres.',
+            'tipo.required' => 'Debe seleccionar un tipo de persona.',
+            'tipo.in' => 'El tipo seleccionado no es válido.',
+        ]);
+
+        try {
+            $persona->update($validated);
+            return redirect()->route('personas.index')->with('success', 'Persona actualizada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $persona = PersonaPrestamo::find($id);
+
+        if (!$persona) {
+            return redirect()->route('personas.index')
+                            ->with('error', 'Persona no encontrada.');
+        }
+
+        $persona->delete();
+
+        return redirect()->route('personas.index')
+                        ->with('success', 'Persona eliminada correctamente.');
     }
 }

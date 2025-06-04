@@ -70,9 +70,38 @@
                         placeholder="Buscar por nombre o correo">
                 </div>
             </form>
-
         </div>
+        @if (session('success'))
+            <div id="alert-success" class="flex items-center justify-between p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-green-200 dark:text-green-900" role="alert">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4l5-5-1.414-1.414L9 11.172 7.414 9.586 6 11l3 3z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('alert-success').remove()" class="ml-4 text-green-800 hover:underline dark:text-green-900">
+                    ✕
+                </button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div id="alert-error" class="flex items-center justify-between p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-red-200 dark:text-red-900" role="alert">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 002 0V7zm-1 6a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clip-rule="evenodd"/></svg>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" onclick="document.getElementById('alert-error').remove()" class="ml-4 text-red-800 hover:underline dark:text-red-900">
+                    ✕
+                </button>
+            </div>
 
+            <script>
+                setTimeout(() => {
+                    const alert = document.getElementById('alert-error');
+                    if (alert) alert.remove();
+                }, 5000);
+            </script>
+        @endif
         <!-- Tabla -->
         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -165,4 +194,34 @@
             {{ $personas->withQueryString()->links() }}
         </div>
     </div>
+    <!-- Script manual para manejar modales -->
+    <script>
+        document.querySelectorAll('[data-modal-toggle]').forEach(button => {
+            const modalId = button.getAttribute('data-modal-toggle');
+            if (!modalId) return;
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            button.addEventListener('click', () => {
+                modal.classList.toggle('hidden');
+            });
+        });
+
+        document.querySelectorAll('[data-modal-hide]').forEach(button => {
+            const modalId = button.getAttribute('data-modal-hide');
+            if (!modalId) return;
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            button.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        });
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </x-layouts.app>
