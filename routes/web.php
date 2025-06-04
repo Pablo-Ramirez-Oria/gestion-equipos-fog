@@ -23,10 +23,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Las rutas tienen un middleware establecido dentro del controller
     Route::resource('inventario', InventarioController::class);
     Route::resource('prestamos', PrestamoController::class);
-    Route::resource('ubicaciones', UbicacionController::class);
+    Route::resource('ubicaciones', UbicacionController::class)->parameters([
+    'ubicaciones' => 'ubicacion'
+    ]);
     Route::resource('estados', EstadoController::class);
     Route::resource('personas', PersonaController::class);
-    Route::resource('usuarios', UsuarioController::class);
+    // Route::resource('usuarios', UsuarioController::class);
 });
 
 /* Middleware de autenticación */

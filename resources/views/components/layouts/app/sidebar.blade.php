@@ -37,14 +37,14 @@
                 </flux:navlist.group>
             </flux:navlist>
             @endrole
-            <!-- Usuarios -->
-            @role('admin')
+            <!-- Usuarios, consideramos que por ahora no es necesario crear más usuarios para la app -->
+            {{-- @role('admin')
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Gestión de Usuarios')" class="grid">
                     <flux:navlist.item icon="users" :href="route('usuarios.index')" :current="request()->routeIs('usuarios.*')" class="dropdown-toggle">{{ __('Usuarios') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-            @endrole
+            @endrole --}}
 
             <flux:spacer />
 

@@ -3,62 +3,80 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Ubicacion;
 
 class UbicacionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct()
     {
-        return view('modules.ubicaciones.index');
+        // Middleware para autenticación de usuarios
+        $this->middleware('role:admin')->only([
+            'create', 'store', 'edit', 'update', 'destroy'
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(Request $request)
+    {
+        $busqueda = $request->input('busqueda', '');
+
+        $ubicaciones = Ubicacion::query()
+            ->when($busqueda, function ($query, $busqueda) {
+                $query->where('nombre', 'like', "%{$busqueda}%");
+            })
+            ->orderBy('nombre')
+            ->paginate(13)
+            ->withQueryString();
+
+        return view('modules.ubicaciones.index', compact('ubicaciones', 'busqueda'));
+    }
+
     public function create()
     {
-        //
+        return view('modules.ubicaciones.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Ubicacion::create([
+            'nombre' => $request->nombre,
+        ]);
+
+        return redirect()->route('ubicaciones.index')->with('success', 'Ubicación creada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Ubicacion $ubicacion)
     {
-        //
+        return view('modules.ubicaciones.edit', compact('ubicacion'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Ubicacion $ubicacion)
     {
-        //
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255|unique:ubicaciones,nombre,' . $ubicacion->id,
+            'descripcion' => 'nullable|string|max:500',
+        ]);
+
+        $ubicacion->update($validated);
+
+        return redirect()->route('ubicaciones.index')
+            ->with('success', 'Ubicación actualizada correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Ubicacion $ubicacion)
     {
-        //
+        $ubicacion->delete();
+
+        return redirect()->route('ubicaciones.index')
+            ->with('success', 'Ubicación eliminada correctamente.');
     }
+
 }

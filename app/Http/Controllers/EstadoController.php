@@ -3,62 +3,79 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Estado;
 
 class EstadoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct()
     {
-        return view('modules.estados.index');
+        // Middleware para autenticación de usuarios
+        $this->middleware('role:admin')->only([
+            'create', 'store', 'edit', 'update', 'destroy'
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(Request $request)
+    {
+        $busqueda = $request->input('busqueda', '');
+
+        $estados = Estado::query()
+            ->when($busqueda, function ($query, $busqueda) {
+                $query->where('nombre', 'like', "%{$busqueda}%");
+            })
+            ->orderBy('nombre')
+            ->paginate(13)
+            ->withQueryString();
+
+        return view('modules.estados.index', compact('estados', 'busqueda'));
+    }
+
     public function create()
     {
-        //
+        return view('modules.estados.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Estado::create([
+            'nombre' => $request->nombre,
+        ]);
+
+        return redirect()->route('estados.index')->with('success', 'Estado creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Estado $estado)
     {
-        //
+        return view('modules.estados.edit', compact('estado'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Estado $estado)
     {
-        //
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255|unique:estados,nombre,' . $estado->id,
+            'descripcion' => 'nullable|string|max:500',
+        ]);
+
+        $estado->update($validated);
+
+        return redirect()->route('estados.index')
+            ->with('success', 'Estado actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Estado $estado)
     {
-        //
+        $estado->delete();
+
+        return redirect()->route('estados.index')
+            ->with('success', 'Estado eliminado correctamente.');
     }
 }

@@ -8,6 +8,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class PersonaController extends Controller
 {
+    public function __construct()
+    {
+        // Middleware para autenticación de usuarios
+        $this->middleware('role:admin')->only([
+            'create', 'store', 'edit', 'update', 'destroy'
+        ]);
+    }
+    
     public function index(Request $request)
     {
         $query = PersonaPrestamo::query();
