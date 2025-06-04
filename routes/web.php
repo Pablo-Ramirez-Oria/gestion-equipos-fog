@@ -9,7 +9,7 @@ use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\EstadoController;
-use App\Http\Controllers\DispositivoController;
+use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\UsuarioController;
 
 Route::redirect('/', '/dashboard')
@@ -25,7 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('prestamos', PrestamoController::class);
     Route::resource('ubicaciones', UbicacionController::class);
     Route::resource('estados', EstadoController::class);
-    Route::resource('dispositivos', DispositivoController::class);
+    Route::resource('personas', PersonaController::class);
     Route::resource('usuarios', UsuarioController::class);
 });
 
