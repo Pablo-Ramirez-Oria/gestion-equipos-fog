@@ -5,6 +5,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\UbicacionController;
@@ -18,7 +19,7 @@ Route::redirect('/', '/dashboard')
 
 /* Rutas principales pasando por el middleware */
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Las rutas tienen un middleware establecido dentro del controller
     Route::get('/inventario/exportar', [InventarioController::class, 'exportarCsv'])->name('inventario.exportar');
