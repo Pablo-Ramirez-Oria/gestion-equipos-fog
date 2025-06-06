@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             UbicacionSeeder::class,
             EstadoSeeder::class,
             // Seeders para testing (Se eliminarán en producción)
-            SeederCompleto::class,
+            // SeederCompleto::class,
         ]);
     }
 }
