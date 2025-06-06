@@ -8,6 +8,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\InventarioDetalle;
 use App\Models\Estado;
 use App\Models\Ubicacion;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Response;
 
 class InventarioController extends Controller
 {
@@ -317,6 +319,72 @@ class InventarioController extends Controller
         InventarioDetalle::where('fog_id', $id)->delete();
 
         return redirect()->route('inventario.index')->with('success', 'Equipo eliminado correctamente.');
+    }
+
+    public function exportarCSV()
+    {
+        // Petición a la API de FOG para obtener los hosts
+        $response = Http::withHeaders([
+            'fog-api-token' => env('FOG_API_TOKEN'),
+            'fog-user-token' => env('FOG_USER_TOKEN'),
+        ])->get(env('FOG_SERVER_URL') . '/fog/host');
+
+        if (!$response->successful()) {
+            \Log::error('Error al obtener datos de FOG', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            return redirect()->route('home')->with('error', 'No se pudo obtener los datos del inventario.');
+        }
+
+        $fogData = $response->json();
+        $productosFog = $fogData['hosts'] ?? [];
+
+        $fogIds = array_column($productosFog, 'id');
+        $detalles = InventarioDetalle::with(['ubicacion', 'estado'])
+            ->whereIn('fog_id', $fogIds)
+            ->get()
+            ->keyBy('fog_id');
+
+        $productos = collect($productosFog)->map(function ($producto) use ($detalles) {
+            $id = $producto['id'];
+            $detalle = $detalles[$id] ?? null;
+
+            return [
+                'ID' => $id,
+                'Nombre' => $producto['name'] ?? '-',
+                'Descripción' => $producto['description'] ?? '-',
+                'IP' => $producto['ip'] ?? '-',
+                'Fecha de creación' => $producto['createdTime'] ?? '-',
+                'MAC' => $producto['primac'] ?? '-',
+                'Ubicación' => $detalle?->ubicacion?->nombre ?? '-',
+                'Estado' => $detalle?->estado?->nombre ?? '-',
+                'Finalidad' => $detalle?->finalidad_actual ?? '-',
+            ];
+        });
+
+        // Crear CSV
+        $filename = 'inventario_' . date('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () use ($productos) {
+            $file = fopen('php://output', 'w');
+
+            // Cabecera CSV
+            fputcsv($file, ['ID', 'Nombre', 'Descripción', 'IP', 'Fecha de creación', 'MAC', 'Ubicación', 'Estado', 'Finalidad']);
+
+            // Filas
+            foreach ($productos as $producto) {
+                fputcsv($file, $producto);
+            }
+
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
     }
 
 }

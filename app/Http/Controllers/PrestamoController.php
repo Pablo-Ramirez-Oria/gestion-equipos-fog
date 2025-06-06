@@ -7,6 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Prestamo;
 use App\Models\PersonaPrestamo;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PrestamoController extends Controller
 {
@@ -254,6 +255,44 @@ class PrestamoController extends Controller
         $prestamo->delete();
 
         return redirect()->route('prestamos.index')->with('success', 'Préstamo eliminado correctamente.');
+    }
+
+    public function exportarCSV()
+    {
+        $prestamos = Prestamo::with('persona')->get();
+
+        $csvData = [];
+        // Cabecera CSV con el orden solicitado
+        $csvData[] = ['ID', 'Nombre', 'Fog ID', 'Tipo', 'Estado', 'Fecha de creación', 'Fecha Estimación', 'Fecha Entrega'];
+
+        foreach ($prestamos as $prestamo) {
+            $csvData[] = [
+                $prestamo->id,
+                $prestamo->persona->nombre_completo ?? '-',
+                $prestamo->fog_id ?? '-',
+                $prestamo->tipo_prestamo ?? '-',
+                $prestamo->estado, // accesorio getEstadoAttribute
+                $prestamo->fecha_inicio ? $prestamo->fecha_inicio->format('Y-m-d H:i:s') : '-',
+                $prestamo->fecha_estimacion ? $prestamo->fecha_estimacion->format('Y-m-d H:i:s') : '-',
+                $prestamo->fecha_entrega ? $prestamo->fecha_entrega->format('Y-m-d H:i:s') : '-',
+            ];
+        }
+
+        // Crear archivo CSV en memoria
+        $filename = 'prestamos_export_' . date('Ymd_His') . '.csv';
+
+        $handle = fopen('php://memory', 'r+');
+        foreach ($csvData as $row) {
+            fputcsv($handle, $row);
+        }
+        rewind($handle);
+
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($content)
+            ->header('Content-Type', 'text/csv')
+            ->header('Content-Disposition', "attachment; filename=\"$filename\"");
     }
 
 }

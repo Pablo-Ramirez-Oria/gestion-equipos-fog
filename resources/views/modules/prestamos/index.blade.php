@@ -1,5 +1,16 @@
 <x-layouts.app :title="__('Gestión de equipos en el FOG - Préstamos')">
-    <h1 class="text-2xl">Préstamos</h1>
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Préstamos</h1>
+        <a href="{{ route('prestamos.exportar') }}"
+        class="inline-flex items-center px-4 py-2 text-blue-700 dark:text-blue-400 hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"/>
+            </svg>
+            Exportar CSV
+        </a>
+    </div>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <!-- Filtros y barra de búsqueda -->
         <div class="flex flex-col sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">

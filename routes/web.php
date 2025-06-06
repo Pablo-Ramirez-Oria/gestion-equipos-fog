@@ -21,7 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
 
     // Las rutas tienen un middleware establecido dentro del controller
+    Route::get('/inventario/exportar', [InventarioController::class, 'exportarCsv'])->name('inventario.exportar');
     Route::resource('inventario', InventarioController::class);
+    Route::get('/prestamos/exportar', [PrestamoController::class, 'exportarCsv'])->name('prestamos.exportar');
     Route::resource('prestamos', PrestamoController::class);
     Route::resource('ubicaciones', UbicacionController::class)->parameters([
     'ubicaciones' => 'ubicacion'

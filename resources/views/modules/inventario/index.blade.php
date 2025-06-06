@@ -1,5 +1,16 @@
 <x-layouts.app :title="__('Gestión de equipos en el FOG -Inventario')">
-    <h1 class="text-2xl">Inventario</h1>
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Inventario</h1>
+        <a href="{{ route('inventario.exportar') }}"
+        class="inline-flex items-center px-4 py-2 text-blue-700 dark:text-blue-400 hover:underline">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"/>
+            </svg>
+            Exportar CSV
+        </a>
+    </div>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <!-- Filtros y barra de búsqueda -->
         <div class="flex flex-col sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
@@ -140,7 +151,19 @@
                     <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['fecha_creacion'] ?: '-' }}</td>
                     <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['mac'] ?: '-' }}</td>
                     <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['ubicacion'] }}</td>
-                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['estado'] }}</td>
+                    <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">
+                        <span class="px-2 py-1 text-xs font-semibold rounded bg-white dark:bg-gray-900 border 
+                            {{ match($producto['estado']) {
+                                'Disponible'    => 'text-green-600 border-green-200',
+                                'En uso'        => 'text-blue-600 border-blue-200',
+                                'En reparación' => 'text-yellow-600 border-yellow-200',
+                                'En préstamo'   => 'text-purple-600 border-purple-200',
+                                'Dañado'        => 'text-red-600 border-red-200',
+                                default         => 'text-gray-600 border-gray-200',
+                            } }}">
+                            {{ ucfirst($producto['estado']) }}
+                        </span>
+                    </td>
                     <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">{{ $producto['finalidad_actual'] }}</td>
                     <td class="px-4 py-4 whitespace-nowrap truncate max-w-xs">
                         @if (!empty($producto['id_equipo']))
